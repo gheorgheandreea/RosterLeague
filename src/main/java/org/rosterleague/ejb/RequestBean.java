@@ -12,9 +12,8 @@
 package org.rosterleague.ejb;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -512,6 +511,8 @@ public class RequestBean implements Request, Serializable {
 
     @Override
     public void clearAllEntities() {
+        em.createNativeQuery("DELETE FROM PERSISTENCE_ROSTER_TEAM_PLAYER").executeUpdate();
+        em.createQuery("DELETE FROM Match").executeUpdate();
         em.createQuery("DELETE FROM Player").executeUpdate();
         em.createQuery("DELETE FROM Team").executeUpdate();
         em.createQuery("DELETE FROM League").executeUpdate();
@@ -523,6 +524,151 @@ public class RequestBean implements Request, Serializable {
             PlayerDetails playerDetails = new PlayerDetails(player.getId(), player.getName(), player.getPosition(), player.getSalary());
             detailsList.add(playerDetails);
         }
+        return detailsList;
+    }
+    @Override
+    public void createMatch(String id, String homeTeamId, String awayTeamId, int homeScore, int awayScore, LocalDate matchDate) {
+        logger.info("createMatch");
+        try {
+            Team homeTeam = em.find(Team.class, homeTeamId);
+            Team awayTeam = em.find(Team.class, awayTeamId);
+
+            Match match = new Match(id, homeTeam, awayTeam, homeScore, awayScore, matchDate);
+            em.persist(match);
+        } catch (Exception ex) {
+            throw new EJBException(ex);
+        }
+    }
+
+    @Override
+    public List<MatchDetails> getMatchesOfTeam(String teamId) {
+        logger.info("getMatchesOfTeam");
+        List<MatchDetails> detailsList = new ArrayList<>();
+
+        try {
+            Team team = em.find(Team.class, teamId);
+
+            // Găsește toate meciurile unde echipa este acasă sau în deplasare
+            CriteriaQuery<Match> cq = cb.createQuery(Match.class);
+            if (cq != null) {
+                Root<Match> match = cq.from(Match.class);
+
+                Predicate homeTeamPredicate = cb.equal(match.get("homeTeam"), team);
+                Predicate awayTeamPredicate = cb.equal(match.get("awayTeam"), team);
+
+                cq.where(cb.or(homeTeamPredicate, awayTeamPredicate));
+                cq.orderBy(cb.desc(match.get("matchDate")));
+
+                TypedQuery<Match> q = em.createQuery(cq);
+                List<Match> matches = q.getResultList();
+
+                for (Match m : matches) {
+                    MatchDetails md = new MatchDetails(
+                            m.getId(),
+                            m.getHomeTeam().getId(),
+                            m.getHomeTeam().getName(),
+                            m.getAwayTeam().getId(),
+                            m.getAwayTeam().getName(),
+                            m.getHomeScore(),
+                            m.getAwayScore(),
+                            m.getMatchDate()
+                    );
+                    detailsList.add(md);
+                }
+            }
+        } catch (Exception ex) {
+            throw new EJBException(ex);
+        }
+
+        return detailsList;
+    }
+
+    @Override
+    public List<StandingsEntry> getLeagueStandings(String leagueId) {
+        logger.info("getLeagueStandings");
+        Map<String, StandingsEntry> standingsMap = new HashMap<>();
+
+        try {
+            League league = em.find(League.class, leagueId);
+
+            // Inițializează clasamentul cu toate echipele din ligă
+            for (Team team : league.getTeams()) {
+                StandingsEntry entry = new StandingsEntry(team.getId(), team.getName());
+                standingsMap.put(team.getId(), entry);
+            }
+
+            // Găsește toate meciurile din ligă
+            CriteriaQuery<Match> cq = cb.createQuery(Match.class);
+            if (cq != null) {
+                Root<Match> match = cq.from(Match.class);
+                Join<Match, Team> homeTeam = match.join("homeTeam");
+                Join<Team, League> homeLeague = homeTeam.join("league");
+
+                cq.where(cb.equal(homeLeague.get("id"), leagueId));
+
+                TypedQuery<Match> q = em.createQuery(cq);
+                List<Match> matches = q.getResultList();
+
+                // Calculează punctele pentru fiecare echipă
+                for (Match m : matches) {
+                    String homeTeamId = m.getHomeTeam().getId();
+                    String awayTeamId = m.getAwayTeam().getId();
+
+                    StandingsEntry homeEntry = standingsMap.get(homeTeamId);
+                    StandingsEntry awayEntry = standingsMap.get(awayTeamId);
+
+                    if (homeEntry != null && awayEntry != null) {
+                        int homeScore = m.getHomeScore();
+                        int awayScore = m.getAwayScore();
+
+                        if (homeScore > awayScore) {
+                            homeEntry.addWin();
+                            awayEntry.addLoss();
+                        } else if (homeScore < awayScore) {
+                            homeEntry.addLoss();
+                            awayEntry.addWin();
+                        } else {
+                            homeEntry.addDraw();
+                            awayEntry.addDraw();
+                        }
+                    }
+                }
+            }
+
+            // Sortează descrescător după puncte
+            List<StandingsEntry> standings = new ArrayList<>(standingsMap.values());
+            Collections.sort(standings);
+
+            return standings;
+
+        } catch (Exception ex) {
+            throw new EJBException(ex);
+        }
+    }
+
+    @Override
+    public List<LeagueDetails> getAllLeagues() {
+        logger.info("getAllLeagues");
+        List<LeagueDetails> detailsList = new ArrayList<>();
+
+        try {
+            CriteriaQuery<League> cq = cb.createQuery(League.class);
+            if (cq != null) {
+                Root<League> league = cq.from(League.class);
+                cq.select(league);
+
+                TypedQuery<League> q = em.createQuery(cq);
+                List<League> leagues = q.getResultList();
+
+                for (League l : leagues) {
+                    LeagueDetails ld = new LeagueDetails(l.getId(), l.getName(), l.getSport());
+                    detailsList.add(ld);
+                }
+            }
+        } catch (Exception ex) {
+            throw new EJBException(ex);
+        }
+
         return detailsList;
     }
 }

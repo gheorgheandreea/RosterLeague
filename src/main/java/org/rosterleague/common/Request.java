@@ -11,6 +11,7 @@
  */
 package org.rosterleague.common;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -64,4 +65,12 @@ public interface Request {
     void removeTeam(String teamId);
 
     void clearAllEntities();
+
+    void createMatch(String id, String homeTeamId, String awayTeamId,int homeScore, int awayScore, LocalDate matchDate);
+
+    List<MatchDetails> getMatchesOfTeam(String teamId);
+
+    List<StandingsEntry> getLeagueStandings(String leagueId);
+
+    List<LeagueDetails> getAllLeagues();
 }

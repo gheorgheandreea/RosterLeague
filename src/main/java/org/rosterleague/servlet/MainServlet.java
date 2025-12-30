@@ -1,6 +1,7 @@
 package org.rosterleague.servlet;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.inject.Inject;
@@ -10,6 +11,8 @@ import org.rosterleague.common.LeagueDetails;
 import org.rosterleague.common.PlayerDetails;
 import org.rosterleague.common.Request;
 import org.rosterleague.common.TeamDetails;
+import org.rosterleague.common.MatchDetails;
+import org.rosterleague.common.StandingsEntry;
 
 @WebServlet(name = "mainServlet", value = "/")
 public class MainServlet extends HttpServlet {
@@ -21,12 +24,14 @@ public class MainServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ejbRequest.clearAllEntities();
         insertInfo();
+        insertMatches();
 
         printer = response.getWriter();
         response.setContentType("text/plain");
 
         getSomeInfo();
         getMoreInfo();
+        showStandingsAndMatches();
         removeInfo();
     }
 
@@ -170,7 +175,29 @@ public class MainServlet extends HttpServlet {
             ex.printStackTrace(printer);
         }
     }
+    private void insertMatches() {
+        try {
+            // Meciuri pentru Liga L1 (Mountain Soccer)
+            ejbRequest.createMatch("M1", "T1", "T2", 3, 1, LocalDate.of(2024, 11, 10));
+            ejbRequest.createMatch("M2", "T1", "T5", 2, 2, LocalDate.of(2024, 11, 17));
+            ejbRequest.createMatch("M3", "T2", "T5", 1, 0, LocalDate.of(2024, 11, 24));
+            ejbRequest.createMatch("M4", "T5", "T1", 1, 3, LocalDate.of(2024, 12, 1));
+            ejbRequest.createMatch("M5", "T2", "T1", 0, 2, LocalDate.of(2024, 12, 8));
+            ejbRequest.createMatch("M6", "T5", "T2", 2, 1, LocalDate.of(2024, 12, 15));
 
+            // Meciuri pentru Liga L2 (Valley Basketball)
+            ejbRequest.createMatch("M7", "T3", "T4", 85, 78, LocalDate.of(2024, 11, 12));
+            ejbRequest.createMatch("M8", "T4", "T3", 92, 88, LocalDate.of(2024, 11, 19));
+            ejbRequest.createMatch("M9", "T3", "T4", 95, 95, LocalDate.of(2024, 11, 26));
+            ejbRequest.createMatch("M10", "T4", "T3", 80, 85, LocalDate.of(2024, 12, 3));
+
+        } catch (Exception ex) {
+            if (printer != null) {
+                printer.println("Caught an exception in insertMatches: " + ex.getClass() + " : " + ex.getMessage());
+                ex.printStackTrace(printer);
+            }
+        }
+    }
     private void getSomeInfo() {
         try {
             List<PlayerDetails> playerList;
@@ -293,7 +320,41 @@ public class MainServlet extends HttpServlet {
             ex.printStackTrace(printer);
         }
     }
+    private void showStandingsAndMatches() {
+        try {
+            printer.println("========================================");
+            printer.println("CLASAMENT LIGA L1 (Mountain Soccer):");
+            printer.println("========================================");
+            List<StandingsEntry> standingsL1 = ejbRequest.getLeagueStandings("L1");
+            printDetailsList(standingsL1);
+            printer.println();
 
+            printer.println("========================================");
+            printer.println("MECIURILE ECHIPEI T1 (Honey Bees):");
+            printer.println("========================================");
+            List<MatchDetails> matchesT1 = ejbRequest.getMatchesOfTeam("T1");
+            printDetailsList(matchesT1);
+            printer.println();
+
+            printer.println("========================================");
+            printer.println("CLASAMENT LIGA L2 (Valley Basketball):");
+            printer.println("========================================");
+            List<StandingsEntry> standingsL2 = ejbRequest.getLeagueStandings("L2");
+            printDetailsList(standingsL2);
+            printer.println();
+
+            printer.println("========================================");
+            printer.println("MECIURILE ECHIPEI T3 (Deer):");
+            printer.println("========================================");
+            List<MatchDetails> matchesT3 = ejbRequest.getMatchesOfTeam("T3");
+            printDetailsList(matchesT3);
+            printer.println();
+
+        } catch (Exception ex) {
+            printer.println("Caught an exception: " + ex.getClass() + " : " + ex.getMessage());
+            ex.printStackTrace(printer);
+        }
+    }
     private void removeInfo() {
         try {
             printer.println("Removing team T6. ");
