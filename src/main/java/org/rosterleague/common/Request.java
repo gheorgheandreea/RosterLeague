@@ -18,6 +18,7 @@ import java.util.List;
 public interface Request {
     void addPlayer(String playerId, String teamId);
 
+
     void createLeague(LeagueDetails leagueDetails);
 
     void createPlayer(String id, String name, String position, double salary);

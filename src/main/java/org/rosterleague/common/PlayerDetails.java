@@ -23,6 +23,7 @@ public class PlayerDetails implements Serializable {
     private final String position;
     private final double salary;
 
+
     public PlayerDetails(String id, String name, String position,
             double salary) {
 

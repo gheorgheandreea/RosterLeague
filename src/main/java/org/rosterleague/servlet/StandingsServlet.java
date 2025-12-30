@@ -19,6 +19,7 @@ public class StandingsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("text/html;charset=UTF-8");
+
         PrintWriter out = response.getWriter();
 
         String leagueId = request.getParameter("leagueId");

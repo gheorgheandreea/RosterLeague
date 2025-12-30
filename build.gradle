@@ -35,7 +35,8 @@ dependencies {
 
     // another example of JPA annotation processor
     // annotationProcessor('org.hibernate:hibernate-jpamodelgen:7.1.1.Final')
-
+    implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
+    implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.0'
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
