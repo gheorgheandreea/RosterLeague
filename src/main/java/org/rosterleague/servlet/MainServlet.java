@@ -14,7 +14,7 @@ import org.rosterleague.common.TeamDetails;
 import org.rosterleague.common.MatchDetails;
 import org.rosterleague.common.StandingsEntry;
 
-@WebServlet(name = "mainServlet", value = "/")
+@WebServlet(name = "mainServlet", value = "/test")
 public class MainServlet extends HttpServlet {
     @Inject
     Request ejbRequest;
