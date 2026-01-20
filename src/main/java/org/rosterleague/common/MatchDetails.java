@@ -8,6 +8,7 @@ public class MatchDetails implements Serializable {
     @Serial
     private static final long serialVersionUID = 987654321098765432L;
 
+
     private final String id;
     private final String homeTeamId;
     private final String homeTeamName;

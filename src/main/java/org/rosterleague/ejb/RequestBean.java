@@ -55,6 +55,7 @@ public class RequestBean implements Request, Serializable {
     public void createPlayer(String id, String name, String position, double salary) {
         logger.info("createPlayer");
         try {
+
             Player player = new Player(id, name, position, salary);
             em.persist(player);
         } catch (Exception ex) {

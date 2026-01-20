@@ -100,6 +100,7 @@ public class MainServlet extends HttpServlet {
             ejbRequest.createPlayer("P13", "Audrey Brown", "small forward", 995.00);
             ejbRequest.addPlayer("P13", "T3");
 
+
             ejbRequest.createPlayer("P14", "Jack Patterson", "power forward", 100.00);
             ejbRequest.addPlayer("P14", "T3");
 

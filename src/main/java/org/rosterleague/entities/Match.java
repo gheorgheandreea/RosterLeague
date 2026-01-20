@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "PERSISTENCE_ROSTER_MATCH")
 public class Match implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1234567890123456789L;
 
