@@ -57,7 +57,7 @@
                 <c:choose>
                     <c:when test="${empty matches}">
                         <div class="p-4">
-                            <div class="alert alert-info m-0">No matches found for this team.</div>
+                            <div class="alert alert-info m-0">No  matches found for this team.</div>
                         </div>
                     </c:when>
                     <c:otherwise>

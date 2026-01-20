@@ -42,6 +42,6 @@ public class MatchesServlet extends HttpServlet {
              request.setAttribute("error", "Eroare la încărcarea datelor: " + e.getMessage());
             }
         }
-        request.getRequestDispatcher("/matches.jsp").forward(request, response);
+        request.getRequestDispatcher("/matches.jsp").forward(request,response);
     }
 }
