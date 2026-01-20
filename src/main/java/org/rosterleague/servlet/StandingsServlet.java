@@ -35,6 +35,6 @@ public class StandingsServlet extends HttpServlet {
                 request.setAttribute("error", "Eroare la încărcarea clasamentului: " + e.getMessage());
             }
         }
-        request.getRequestDispatcher("/standings.jsp").forward(request,response);
+        request.getRequestDispatcher("/standings.jsp").forward(request, response);
     }
 }

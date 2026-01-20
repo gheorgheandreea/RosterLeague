@@ -53,7 +53,7 @@
                                 <tr>
                                     <th style="width: 80px;">#</th>
                                     <th>Team</th>
-                                    <th class="text-center"> MP</th>
+                                    <th class="text-center">MP</th>
                                     <th class="text-center">W</th>
                                     <th class="text-center">D</th>
                                     <th class="text-center">L</th>
